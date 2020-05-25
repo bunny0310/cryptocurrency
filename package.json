@@ -1,0 +1,27 @@
+{
+  "name": "cryptochain",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --watchAll",
+    "start": "npm run redis && nodemon index.js",
+    "start-peer": "cross-env GENERATE_PEER_PORT='true' nodemon index.js",
+    "redis": "redis-server --daemonize yes"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^23.6.0"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cross-env": "^5.2.0",
+    "crypto": "^1.0.1",
+    "express": "^4.16.3",
+    "hex-to-binary": "^1.0.1",
+    "nodemon": "^2.0.4",
+    "redis": "^2.8.0",
+    "request": "^2.88.0"
+  }
+}

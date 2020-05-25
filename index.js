@@ -9,7 +9,7 @@ app.use(bodyParser.json());
 const blockchain = new Blockchain();
 const pubsub = new PubSub({blockchain});
 
-const DEFAULT_PORT=3000;
+const DEFAULT_PORT=3000; 
 const ROOT_NODE_URL = 'http://localhost:'+DEFAULT_PORT;
 
 const syncChains = ()=>{

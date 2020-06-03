@@ -6,6 +6,7 @@ const request = require("request");
 const Wallet = require("./wallet");
 const Transaction = require("./wallet/transaction");
 const TransactionPool = require("./wallet/transaction-pool");
+const TransactionMiner = require("./app/transaction-miner");
 
 const app = express();
 app.use(bodyParser.json());
@@ -13,6 +14,7 @@ const blockchain = new Blockchain();
 const wallet = new Wallet();
 const transactionPool = new TransactionPool();
 const pubsub = new PubSub({blockchain,transactionPool});
+const transactionMiner = new TransactionMiner({ blockchain, transactionPool, wallet, pubsub });
 
 const DEFAULT_PORT=3000; 
 const ROOT_NODE_URL = 'http://localhost:'+DEFAULT_PORT;
@@ -83,6 +85,12 @@ app.post('/api/transact', (req,res)=>{
 app.get('/api/transaction-pool-map', (req,res)=>{
     res.status(200).json({transactionPoolMap: transactionPool.transactionMap});
 })
+app.get('/api/mine-transactions', (req,res)=>{
+    transactionMiner.mineTransactions();
+    res.redirect('/api/blocks');
+});
+
+
 
 let PEER_PORT;
 if(process.env.GENERATE_PEER_PORT === 'true')

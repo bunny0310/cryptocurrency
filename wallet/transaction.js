@@ -1,4 +1,3 @@
-const Wallet = require('./index');
 const uuid = require("uuid/v1");
 const cryptoHash = require("../util/crypto-hash");
 const {verifySignature} = require('../util');
@@ -6,12 +5,11 @@ const {REWARD_INPUT,MINING_REWARD} = require("../config");
 
 class Transaction
 {
-    constructor({senderWallet,amount,recipient, outputMap, input})
-    {
+    constructor({ senderWallet, recipient, amount, outputMap, input }) {
         this.id = uuid();
-        this.outputMap = outputMap || this.createOutputMap({senderWallet,amount,recipient});
-        this.input = input || this.createInput({senderWallet,outputMap: this.outputMap});
-    }
+        this.outputMap = outputMap || this.createOutputMap({ senderWallet, recipient, amount });
+        this.input = input || this.createInput({ senderWallet, outputMap: this.outputMap });
+      }
     createOutputMap({senderWallet,amount,recipient})
     {
         const outputMap = {};

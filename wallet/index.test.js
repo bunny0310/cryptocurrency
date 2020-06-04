@@ -119,6 +119,48 @@ describe('Wallet', () => {
           chain:blockchain.chain,
           address: wallet.publicKey
         })).toEqual(STARTING_BALANCE+transaction1.outputMap[wallet.publicKey]+transaction2.outputMap[wallet.publicKey]);
+      });
+
+      describe('and the wallet has made the transaction', ()=>{
+        let recentTransaction;
+        beforeEach(()=>{
+          recentTransaction = wallet.createTransaction({
+            recipient: 'foo-recipient',
+            amount: 20
+          });
+          blockchain.addBlock({data:[recentTransaction]});
+        });
+        
+        it('returns the output amount of the recent transaction', ()=>{
+          expect(Wallet.calculateBalance({
+            chain:blockchain.chain,
+            address:wallet.publicKey
+          })).toEqual(recentTransaction.outputMap[wallet.publicKey]);
+        });
+
+        describe('and there are more outputs next to and after the recent transaction', ()=>{
+          let sameBlockTransaction, nextBlockTransaction;
+          beforeEach(()=>{
+            recentTransaction = wallet.createTransaction({
+              recipient: 'later-foo-address',
+              amount: 20
+            });
+            sameBlockTransaction = Transaction.rewardTransaction({minerWallet: wallet});
+            blockchain.addBlock({data:[recentTransaction,sameBlockTransaction]});
+            nextBlockTransaction = new Wallet().createTransaction({
+              amount:75,
+              recipient:wallet.publicKey
+            });
+            blockchain.addBlock({data:[nextBlockTransaction]});
+          });
+          it('adds up all the output values', ()=>{
+            expect(Wallet.calculateBalance({
+              chain:blockchain.chain,
+              address: wallet.publicKey
+            }))
+            .toEqual(recentTransaction.outputMap[wallet.publicKey]+sameBlockTransaction.outputMap[wallet.publicKey]+nextBlockTransaction.outputMap[wallet.publicKey]);
+          })
+        })
       })
     })
   })

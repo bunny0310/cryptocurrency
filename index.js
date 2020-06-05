@@ -71,7 +71,7 @@ app.post('/api/transact', (req,res)=>{
         }
         else
         {
-            transaction = wallet.createTransaction({amount,recipient,chain});
+            transaction = wallet.createTransaction({amount,recipient,chain:blockchain.chain});
         }
     }catch(err)
     {
@@ -88,6 +88,18 @@ app.get('/api/transaction-pool-map', (req,res)=>{
 app.get('/api/mine-transactions', (req,res)=>{
     transactionMiner.mineTransactions();
     res.redirect('/api/blocks');
+});
+app.get('/api/wallet-info', (req,res)=>{
+    const address = wallet.publicKey;
+    res.status(200).json({
+        address,
+        balance: Wallet.calculateBalance(
+            {
+                chain:blockchain.chain,
+                address
+            }
+        )
+    });
 });
 
 

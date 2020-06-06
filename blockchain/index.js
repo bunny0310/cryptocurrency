@@ -33,10 +33,15 @@ class Blockchain
         return true;
     }
 
-    replaceChain(newChain, onSuccess)
+    replaceChain(newChain, validateTransactions, onSuccess)
     {
         if(newChain.length<=this.chain.length){
             console.error("The incoming chain must be longer");
+            return;
+        }
+        if(validateTransactions && !this.validTransactionData({chain: newChain}))
+        {
+            console.error("transaction data invalid!");
             return;
         }
         if(Blockchain.isValidChain(newChain))
@@ -58,6 +63,7 @@ class Blockchain
         {
             const block = chain[i];
             let count = 0;
+            let set = new Set();
             for(let transaction of block.data)
             {
                 if (transaction.input.address === REWARD_INPUT.address)
@@ -90,7 +96,9 @@ class Blockchain
                         return false;
                     }
                 }
+                set.add(transaction);
             }
+            if(set.size !== block.data.length)return false;
         }
         return true;
     }

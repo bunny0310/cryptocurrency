@@ -3,6 +3,8 @@ const bodyParser = require("body-parser");
 const Blockchain = require("./blockchain");
 const PubSub = require("./app/pubsub");
 const request = require("request");
+const cors = require("cors");
+const path = require("path");
 const Wallet = require("./wallet");
 const Transaction = require("./wallet/transaction");
 const TransactionPool = require("./wallet/transaction-pool");
@@ -10,6 +12,9 @@ const TransactionMiner = require("./app/transaction-miner");
 
 const app = express();
 app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname,'client/public')));
+app.use(cors());
+
 const blockchain = new Blockchain();
 const wallet = new Wallet();
 const transactionPool = new TransactionPool();

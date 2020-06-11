@@ -1,5 +1,5 @@
-const INITIAL_DIFFICULTY = 3;
-const MINE_RATE = 1000; //in milli seconds
+const INITIAL_DIFFICULTY = 20;
+const MINE_RATE = 600000; //in milli seconds
 const STARTING_BALANCE = 1000;
 
 const GENESIS_DATA = {

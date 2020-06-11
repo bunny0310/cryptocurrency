@@ -9,6 +9,11 @@ const Wallet = require("./wallet");
 const Transaction = require("./wallet/transaction");
 const TransactionPool = require("./wallet/transaction-pool");
 const TransactionMiner = require("./app/transaction-miner");
+const isDevelopment = process.env.ENV === 'development';
+
+const REDIS_URL = isDevelopment ?
+  'redis://127.0.0.1:6379' :
+  'redis://h:p8cebc8dfc62a0d728f98a7dbe778658ad8bed5469392ee42300706aece2b07dc@ec2-3-221-10-247.compute-1.amazonaws.com:25299'
 
 const app = express();
 app.use(bodyParser.json());
@@ -18,7 +23,7 @@ app.use(cors());
 const blockchain = new Blockchain();
 const wallet = new Wallet();
 const transactionPool = new TransactionPool();
-const pubsub = new PubSub({blockchain,transactionPool});
+const pubsub = new PubSub({ blockchain, transactionPool, redisUrl: REDIS_URL });
 const transactionMiner = new TransactionMiner({ blockchain, transactionPool, wallet, pubsub });
 
 const DEFAULT_PORT=3000; 
@@ -106,7 +111,45 @@ app.get('/api/wallet-info', (req,res)=>{
         )
     });
 });
-
+if (isDevelopment) {
+    const walletFoo = new Wallet();
+    const walletBar = new Wallet();
+  
+    const generateWalletTransaction = ({ wallet, recipient, amount }) => {
+      const transaction = wallet.createTransaction({
+        recipient, amount, chain: blockchain.chain
+      });
+  
+      transactionPool.setTransaction(transaction);
+    };
+  
+    const walletAction = () => generateWalletTransaction({
+      wallet, recipient: walletFoo.publicKey, amount: 5
+    });
+  
+    const walletFooAction = () => generateWalletTransaction({
+      wallet: walletFoo, recipient: walletBar.publicKey, amount: 10
+    });
+  
+    const walletBarAction = () => generateWalletTransaction({
+      wallet: walletBar, recipient: wallet.publicKey, amount: 15
+    });
+  
+    for (let i=0; i<10; i++) {
+      if (i%3 === 0) {
+        walletAction();
+        walletFooAction();
+      } else if (i%3 === 1) {
+        walletAction();
+        walletBarAction();
+      } else {
+        walletFooAction();
+        walletBarAction();
+      }
+  
+      transactionMiner.mineTransactions();
+    }
+  }
 
 
 let PEER_PORT;
